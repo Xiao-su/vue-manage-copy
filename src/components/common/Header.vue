@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <!-- 折叠按钮 -->
-    <div class="collapse-btn">
+    <div class="collapse-btn" @click="collapseChage">
       <i class="el-icon-menu"></i>
     </div>
     <div class="logo">后台管理系统</div>
@@ -41,9 +41,12 @@
 </template>
 <script>
 import userImg from '@/assets/logo.png'
+import bus from '@/config/bus.js'
+
 export default {
   data () {
     return {
+      collapse: false,
       userImgUrl: userImg,
       fullScreen: false,
       messages: 2,
@@ -80,6 +83,10 @@ export default {
       this.fullScreen = !this.fullScreen;
     },
     handleCommand () {
+    },
+    collapseChage () {
+      this.collapse = !this.collapse
+      bus.$emit('collapse', this.collapse)
     }
   }
 }
