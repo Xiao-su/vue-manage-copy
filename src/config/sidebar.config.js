@@ -1,21 +1,21 @@
-var sidebarList = [
+let sidebarList = [
   {
-    icon: 'el-icon-lx-home',
+    icon: 'el-icon-sukehuduan',
     index: 'dashboard',
     title: '系统首页'
   },
   {
-    icon: 'el-icon-lx-cascades',
-    index: 'table',
-    title: '基础表格'
+    icon: 'el-icon-suicon_yingyongguanli',
+    index: 'charts',
+    title: 'Charts图表'
   },
   {
-    icon: 'el-icon-lx-copy',
+    icon: 'el-icon-sudangan1',
     index: 'tabs',
     title: 'tab选项卡'
   },
   {
-    icon: 'el-icon-lx-calendar',
+    icon: 'el-icon-sudingdan',
     index: '3',
     title: '表单相关',
     subs: [
@@ -44,17 +44,17 @@ var sidebarList = [
     ]
   },
   {
-    icon: 'el-icon-lx-emoji',
+    icon: 'el-icon-suzhiguanxianguanli',
     index: 'icon',
     title: '自定义图标'
   },
   {
-    icon: 'el-icon-lx-favor',
-    index: 'charts',
+    icon: 'el-icon-suzhibenjibiao',
+    index: 'chart',
     title: 'schart图表'
   },
   {
-    icon: 'el-icon-rank',
+    icon: 'el-icon-sujiedianguanli',
     index: '6',
     title: '拖拽组件',
     subs: [
@@ -69,7 +69,7 @@ var sidebarList = [
     ]
   },
   {
-    icon: 'el-icon-lx-warn',
+    icon: 'el-icon-suyingyongshangdian',
     index: '7',
     title: '错误处理',
     subs: [
@@ -85,4 +85,4 @@ var sidebarList = [
   }
 ]
 
-export {sidebarList}
+export default sidebarList

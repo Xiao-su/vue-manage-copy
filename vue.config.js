@@ -4,5 +4,6 @@ module.exports = {
     port: '3000',
     https: false,
     hotOnly: true,
+    proxy: 'http://localhost:8000'
   }
 }

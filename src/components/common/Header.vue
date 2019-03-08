@@ -1,7 +1,79 @@
+<style scoped>
+  .header {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 70px;
+    font-size: 22px;
+    color: #fff;
+  }
+  .collapse-btn{
+    float: left;
+    padding: 0 21px;
+    cursor: pointer;
+    line-height: 70px;
+  }
+  .header .logo{
+    float: left;
+    width:250px;
+    line-height: 70px;
+  }
+  .header-right{
+    float: right;
+    padding-right: 50px;
+  }
+  .header-user-con{
+    display: flex;
+    height: 70px;
+    align-items: center;
+  }
+  .btn-fullscreen{
+    transform: rotate(45deg);
+    margin-right: 5px;
+    font-size: 24px;
+  }
+  .btn-bell, .btn-fullscreen{
+    position: relative;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    border-radius: 15px;
+    cursor: pointer;
+  }
+  .btn-bell-badge{
+    position: absolute;
+    right: 0;
+    top: -2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: #f56c6c;
+    color: #fff;
+  }
+  .btn-bell .el-icon-bell{
+    color: #fff;
+  }
+  .user-avator{
+    margin-left: 20px;
+  }
+  .user-avator img{
+    display: block;
+    width:40px;
+    height:40px;
+    border-radius: 50%;
+  }
+  .user-options{
+    margin-left:20px;
+  }
+  .el-dropdown {
+    color: #fff;
+    font-size: 16px;
+  }
+</style>
 <template>
   <div class="header">
     <!-- 折叠按钮 -->
-    <div class="collapse-btn" @click="collapseChage">
+    <div class="collapse-btn" @click="collapseChange">
       <i class="el-icon-menu"></i>
     </div>
     <div class="logo">后台管理系统</div>
@@ -9,56 +81,71 @@
       <div class="header-user-con">
         <!-- 全屏显示 -->
         <div class="btn-fullscreen" @click="handleFullScreen">
-          <el-tooltip effect="dark" placement="bottom" :content="fullScreen?'取消全屏':'全屏'">
+          <el-tooltip effect="dark" :content="fullscreen?`取消全屏`:`全屏`" placement="bottom">
             <i class="el-icon-rank"></i>
           </el-tooltip>
         </div>
         <!-- 消息中心 -->
         <div class="btn-bell">
-          <el-tooltip effect="dark" placement="bottom" :content="messages?`有${messages}条未读信息`:`消息中心`">
-            <i class="el-icon-bell"></i>
+          <el-tooltip effect="dark" :content="message?`有${message}条未读信息`:`消息中心`" placement="bottom">
+            <router-link to="/tabs">
+              <i class="el-icon-bell"></i>
+            </router-link>
           </el-tooltip>
-          <span class="btn-bell-badge" v-if="messages"></span>
+          <span class="btn-bell-badge" v-if="message"></span>
         </div>
         <!-- 用户头像 -->
         <div class="user-avator">
-          <img :src="userImgUrl" alt="logoImg">
+          <img :src="userAvatorImg" alt="userAvator">
         </div>
         <!-- 用户名下拉菜单 -->
-        <el-dropdown class="user-name" @command="handleCommand">
-          <span class="el-dropdown-link">
-            {{userName}}<i class="el-icon-caret-bottom el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>关于作者</el-dropdown-item>
-            <el-dropdown-item>项目仓库</el-dropdown-item>
-            <el-dropdown-item divided command="signOut">退出登录</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+        <div class="user-options">
+          <el-dropdown trigger="click" @command="handleCommand">
+            <span class="el-dropdown-link">
+              {{username}}<i class="el-icon-caret-bottom"></i>
+            </span>
+             <el-dropdown-menu slot="dropdown">
+                <a href="/">
+                  <el-dropdown-item>关于作者</el-dropdown-item>
+                </a>
+                <a href="/">
+                  <el-dropdown-item>项目仓库</el-dropdown-item>
+                </a>
+                <el-dropdown-item divided  command="loginout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+          </el-dropdown>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-import userImg from '@/assets/logo.png'
+import avatorImg from '@/assets/img/useravator.jpg'
 import bus from '@/config/bus.js'
 
 export default {
   data () {
     return {
-      collapse: false,
-      userImgUrl: userImg,
-      fullScreen: false,
-      messages: 2,
-      userName: 'Admin'
+      fullscreen: false,
+      message: 2,
+      userAvatorImg: avatorImg
+    }
+  },
+  computed: {
+    username () {
+      let username = localStorage.getItem('ms_username')
+      return username == 'admin' ? 'admin' : 'customer'
     }
   },
   methods: {
+    collapseChange () {
+      // 折叠按钮
+      this.collapse = !this.collapse
+      bus.$emit('collapse', this.collapse)
+    },
     handleFullScreen () {
-      // 全屏事件
-      // 兼容性全屏写法 标准, chrom, firefox, ie 
       let element = document.documentElement;
-      if (this.fullScreen) {
+      if (this.fullscreen) {
           if (document.exitFullscreen) {
               document.exitFullscreen();
           } else if (document.webkitCancelFullScreen) {
@@ -80,83 +167,19 @@ export default {
               element.msRequestFullscreen();
           }
       }
-      this.fullScreen = !this.fullScreen;
+      this.fullscreen = !this.fullscreen;
     },
-    handleCommand () {
-    },
-    collapseChage () {
-      this.collapse = !this.collapse
-      bus.$emit('collapse', this.collapse)
+    handleCommand (command) {
+      if (Object.is(command, 'loginout')) {
+        localStorage.removeItem('ms_username')
+        this.router.push('/login')
+      } 
+    }
+  },
+  mounted () {
+    if (document.body.clientWidth < 1500) {
+      this.collapseChange()
     }
   }
 }
 </script>
-<style scoped>
-  .header {
-    position: relative;
-    box-sizing: border-box;
-    width: 100%;
-    height: 70px;
-    font-size: 22px;
-    color: #ffffff;
-  }
-  .collapse-btn {
-    float: left;
-    padding: 0 21px;
-    cursor: pointer;
-    line-height: 70px;
-  }
-  .logo {
-    float: left;
-    width: 250px;
-    line-height: 70px;
-  }
-  .header-right {
-    float: right;
-    padding-right: 50px;
-  }
-  .header-user-con {
-    display: flex;
-    height: 70px;
-    align-items: center;
-  }
-  .btn-fullscreen {
-    transform: rotate(45deg);
-    margin-right: 5px;
-    font-size: 24px;
-  }
-  .btn-bell, .btn-fullscreen {
-    position: relative;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    border-radius: 15px;
-    cursor: pointer;
-  }
-  .btn-bell-badge {
-    position:absolute;
-    right: 0;
-    top: -2px;
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
-    background-color: #f56c6c;
-    color: #ffffff;
-  }
-  .user-avator{
-    margin-left: 20px;
-  }
-  .user-avator img{
-    display: block;
-    width:40px;
-    height:40px;
-    border-radius: 50%;
-  }
-  .user-name {
-    margin-left: 10px;
-  }
-  .el-dropdown-link{
-    color: #fff;
-    cursor: pointer;
-  }
-</style>
