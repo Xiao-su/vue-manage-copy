@@ -73,11 +73,34 @@
           </div>
           <el-table :data="todoList" :show-header="false" height="304" style="width:100%;font-size:14px;">
             <el-table-column width="40">
-              <template slot-scope="scope">
-                <el-checkbox v-model="scope.row.title"></el-checkbox>
+              <template v-slot="scope">
+                <el-checkbox v-model="scope.row.status"></el-checkbox>
               </template>
             </el-table-column>
+            <el-table-column>
+                <template v-slot="scope">
+                    <div class="todo-item" :class="{'todo-item-del': scope.row.status}">{{scope.row.title}}</div>
+                </template>
+            </el-table-column>
+            <el-table-column width="60">
+                <template v-slot="scope">
+                    <i class="el-icon-edit"></i>
+                    <i class="el-icon-delete"></i>
+                </template>
+            </el-table-column>
           </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <schart ref="bar" class="schart" canvasId="bar" :data="data" type="bar" :options="options"/>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <schart ref="line" class="schart" canvasId="line" :data="data" type="line" :options="options2"/>
         </el-card>
       </el-col>
     </el-row>
@@ -86,19 +109,103 @@
 <script>
 import userimg from '@/assets/img/useravator.jpg'
 import {todoList} from '@/hypotheticaldata/dashboard.js'
+import Schart from 'vue-schart'
+import bus from '@/config/bus.js'
 
 export default {
+  name: 'dashboard',
   data () {
     return {
       userImg:userimg,
       name: localStorage.getItem('ms_username') || 'customer',
-      todoList: todoList
+      todoList: todoList,
+      data: [{
+        name: '2018/09/04',
+        value: 1083
+      },
+      {
+        name: '2018/09/05',
+        value: 941
+      },
+      {
+        name: '2018/09/06',
+        value: 1139
+      },
+      {
+        name: '2018/09/07',
+        value: 816
+      },
+      {
+        name: '2018/09/08',
+        value: 327
+      },
+      {
+        name: '2018/09/09',
+        value: 228
+      },
+      {
+        name: '2018/09/10',
+        value: 1065
+      }],
+      options: {
+        title: '最近七天每天的用户访问量',
+        showValue: false,
+        fillColor: 'rgb(45, 140, 240)',
+        bottomPadding: 30,
+        topPadding: 30
+      },
+      options2: {
+        title: '最近七天用户访问趋势',
+        fillColor: '#FC6FA1',
+        axisColor: '#008ACD',
+        contentColor: '#EEEEEE',
+        bgColor: '#F5F8FD',
+        bottomPadding: 30,
+        topPadding: 30
+      }
     }
+  },
+  components: {
+    Schart
   },
   computed: {
     role () {
       return this.name === 'admin' ? '超级管理员' : '普通用户'
     }
+  },
+  methods: {
+    changeDate () {
+      const now = new Date().getTime()
+      this.data.forEach((item, key) => {
+        const date = new Date(now - (6 - key) * 86400000)
+        item.name = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
+      })
+    },
+    handleBus (msg) {
+      let self = this
+      setTimeout(() => {
+        self.renderChart()
+      },300)
+    },
+    renderChart () {
+      this.$refs.bar.renderChart()
+      this.$refs.line.renderChart()
+    },
+    handleListener () {
+      bus.$on('collapse', this.handleBus)
+      window.addEventListener('resize', this.renderChart)
+    }
+  },
+  activated () {
+    this.handleListener()
+  },
+  deactivated () {
+    window.removeEventListener('resize', this.renderChart)
+    bus.$off('collapse', this.handleBus)
+  },
+  created () {
+    this.handleListener()
+    this.changeDate()
   }
 }
 </script>

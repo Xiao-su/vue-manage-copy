@@ -18,6 +18,31 @@ var router = new Router({
           path: '/dashboard',
           meta: {title: '系统首页'},
           component: resolve => require(['@/components/page/Dashboard.vue'], resolve)
+        },
+        {
+          path: '/table',
+          meta: {title: '基本表格'},
+          component: resolve => require(['@/components/page/BaseTable.vue'], resolve)
+        },
+        {
+          path: '/charts',
+          meta: {title: 'schart图表'},
+          component: resolve => require(['@/components/page/BaseCharts.vue'], resolve)
+        },
+        {
+          path: '/tabs',
+          meta: {title: '选项卡'},
+          component: resolve => require(['@/components/page/Tabs.vue'], resolve)
+        },
+        {
+          path: '/form',
+          meta: {title: '基本表单'},
+          component: resolve => require(['@/components/page/BaseForm.vue'], resolve)
+        },
+        {
+          path: '/editor',
+          meta: {title: '富文本编辑器'},
+          component: resolve => require(['@/components/page/VueEditor.vue'], resolve)
         }
       ]
     }
